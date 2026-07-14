@@ -3,7 +3,8 @@
 > **Multi-agent web investigation** — ask any question, get a structured research report delivered to your inbox in seconds.
 
 ![Deep Research UI](https://img.shields.io/badge/UI-Gradio-orange?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=flat-square)
+![uv](https://img.shields.io/badge/managed%20with-uv-de5fe9?style=flat-square)
 ![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991?style=flat-square)
 ![Gemini](https://img.shields.io/badge/Google-Gemini-4285F4?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
@@ -52,16 +53,23 @@ Your question
 
 ## Quickstart
 
+This project is managed with [**uv**](https://docs.astral.sh/uv/) — no manual virtualenv or `pip install` needed. If you don't have it yet:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh   # macOS / Linux
+# Windows: powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
 ### 1 — Clone & install
 
 ```bash
 git clone https://github.com/your-username/deep-research.git
 cd deep-research
 
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+uv sync
 ```
+
+`uv sync` creates a `.venv` and installs every dependency pinned in `uv.lock` — reproducible, no separate `pip install` step.
 
 ### 2 — Configure secrets
 
@@ -73,7 +81,7 @@ cp .env.example .env
 ### 3 — Run
 
 ```bash
-python app.py
+uv run app.py
 ```
 
 Open **http://localhost:7860** in your browser.
@@ -121,7 +129,8 @@ deep_research/
 ├── messenger.py         # SMTP + Pushover helpers
 ├── .env.example         # Template — copy to .env and fill in keys
 ├── .gitignore           # Keeps secrets and caches out of git
-└── requirements.txt     # Python dependencies
+├── pyproject.toml       # Project metadata & dependencies
+└── uv.lock              # Locked, reproducible dependency versions
 ```
 
 ---
@@ -144,6 +153,14 @@ Converts the markdown report into a well-formatted HTML email (or a Pushover not
 
 ## Extending the project
 
+**Add a dependency**
+
+```bash
+uv add some-package
+```
+
+This updates `pyproject.toml` and `uv.lock` together — no need to touch either by hand.
+
 **Add a new LLM provider**
 
 Edit `config.py` — add an entry to `PROVIDER` with the provider name, API key, and base URL. Then call `get_model("your-provider", "model-name")` in any agent file.
@@ -160,7 +177,8 @@ Set `HOW_MANY_SEARCHES=5` (or higher) in `.env`. Each extra search adds a parall
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) for dependency management
 - An OpenAI API key with access to `gpt-4o-mini`
 - A Google AI Studio (Gemini) API key
 - (Optional) A Gmail account with App Passwords enabled, or a Pushover account
